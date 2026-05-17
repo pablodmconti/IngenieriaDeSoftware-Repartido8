@@ -1,0 +1,101 @@
+@startuml
+
+' --- CLASES PRINCIPALES Y HERENCIA ---
+
+abstract class Usuario {
+    - idUsuario: int
+    - nombre: String
+    - email: String
+    - contrasenia: String
+    + autenticar(email: String, contrasenia: String): boolean
+}
+
+class Estudiante {
+    - legajo: String
+    + registrarInscripcion(curso: Curso): void
+}
+
+class Docente {
+    - especialidad: String
+    + crearCurso(nombre: String, descripcion: String): void
+}
+
+class Administrador {
+    - nivelAcceso: int
+    + gestionarCuenta(usuario: Usuario, accion: String): void
+}
+
+Usuario <|-- Estudiante
+Usuario <|-- Docente
+Usuario <|-- Administrador
+
+' --- ENTIDADES DEL DOMINIO ---
+
+class Curso {
+    - idCurso: int
+    - nombre: String
+    - descripcion: String
+    - cupoMaximo: int
+    + agregarMaterial(material: Material): void
+}
+
+class Material {
+    - idMaterial: int
+    - titulo: String
+    - tipoArchivo: String
+    - urlArchivo: String
+    + descargar(): void
+}
+
+class Clase {
+    - idClase: int
+    - tema: String
+    - fecha: Date
+    + agregarComentario(comentario: Comentario): void
+}
+
+class Comentario {
+    - idComentario: int
+    - texto: String
+    - fechaHora: Date
+    + validarContenido(): boolean
+}
+
+class Inscripcion {
+    - idInscripcion: int
+    - fechaInscripcion: Date
+    - estado: String
+    + confirmarInscripcion(): void
+}
+
+' --- ASOCIACIONES (CON ROLES Y CARDINALIDADES) ---
+
+' El curso contiene los materiales cargados.
+Curso "1" -- "0..*" Material : contiene >
+
+' El curso está estructurado en diferentes clases.
+Curso "1" -- "1..*" Clase : posee >
+
+' CU1: El estudiante se inscribe en un curso a través de una inscripción.
+Estudiante "1" -- "0..*" Inscripcion : realiza >
+Inscripcion "0..*" -- "1" Curso : corresponde >
+
+' CU2: El estudiante accede al material del curso.
+Estudiante "0..*" -- "0..*" Material : accede >
+
+' CU3: El estudiante deja comentarios en una clase.
+Estudiante "1" -- "0..*" Comentario : escribe >
+Clase "1" -- "0..*" Comentario : registra >
+
+' CU4: El docente crea un curso nuevo.
+Docente "1" -- "0..*" Curso : crea >
+
+' CU5: El docente sube material a un curso.
+Docente "1" -- "0..*" Material : sube >
+
+' CU7: El administrador gestiona cuentas de usuario.
+Administrador "1" -- "0..*" Usuario : gestiona >
+
+' CU8: El administrador modifica el catálogo general de cursos.
+Administrador "1" -- "0..*" Curso : modifica >
+@enduml
